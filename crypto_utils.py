@@ -43,3 +43,5 @@ if __name__ == "__main__":
 
     print(f"Client Key: {client_key.hex()}")
     print(f"Server Key: {server_key.hex()}")
+
+    ## TO DO: DERIVE SHARED AES KEY
