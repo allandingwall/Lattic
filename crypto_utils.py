@@ -27,7 +27,7 @@ if __name__ == "__main__":
     # SERVER
     dsa_pub_key, dsa_sec_key = generate_dsa_keys()
     encap_key, decap_key = generate_kem_keys()
-    sig = create_signature(sk, encap_key)
+    sig = create_signature(dsa_sec_key, encap_key)
     ## SEND PK, EK TO CLIENT
 
     # CLIENT
@@ -41,5 +41,5 @@ if __name__ == "__main__":
     # SERVER
     server_key = decapsulate_key(decap_key, ciphertext)
 
-
-    print(client_key == server_key)
+    print(f"Client Key: {client_key.hex()}")
+    print(f"Server Key: {server_key.hex()}")
