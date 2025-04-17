@@ -1,8 +1,8 @@
 # Notes
-QUIC
+## QUIC
 - aioquic
 
-ML-KEM
+## ML-KEM
 - kyber-py
     - https://github.com/GiacomoPope/kyber-py
 		- There are four functions exposed on the ML_KEM class which are intended for use:
@@ -25,3 +25,7 @@ A key-encapsulation mechanism (KEM) is a set of algorithms that, under certain c
 
 https://datatracker.ietf.org/doc/draft-celi-wiggers-tls-authkem/
 Authentication in TLS 1.3 is achieved by signing the handshake transcript with digital signatures algorithms. KEM-based authentication provides authentication by deriving a shared secret that is encapsulated against the public key contained in the Certificate. Only the holder of the private key corresponding to the certificate's public key can derive the same shared secret and thus decrypt its peer's messages.
+
+
+## ML-DSA
+- dilithium-py
