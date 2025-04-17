@@ -3,6 +3,7 @@ attrs==25.3.0
 certifi==2025.1.31
 cffi==1.17.1
 cryptography==44.0.2
+dilithium-py==1.1.0
 kyber-py==1.0.1
 pyasn1==0.6.1
 pyasn1_modules==0.4.2
