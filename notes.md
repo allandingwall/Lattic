@@ -5,18 +5,12 @@ QUIC
 ML-KEM
 - kyber-py
     - https://github.com/GiacomoPope/kyber-py
+		- There are four functions exposed on the ML_KEM class which are intended for use:
+			* ML_KEM.keygen(): generate a keypair (ek, dk)
+			* ML_KEM.key_derive(seed): generate a keypair (ek, dk) from the provided seed
+			* ML_KEM.encaps(ek): generate a key and ciphertext pair (key, ct)
+			* ML_KEM.decaps(dk, ct): generate the shared key key
 
-There are four functions exposed on the ML_KEM class which are intended for use:
-* ML_KEM.keygen(): generate a keypair (ek, dk)
-* ML_KEM.key_derive(seed): generate a keypair (ek, dk) from the provided seed
-* ML_KEM.encaps(ek): generate a key and ciphertext pair (key, ct)
-* ML_KEM.decaps(dk, ct): generate the shared key key
-
-￼
-
-
-Based on the above, how is this actually assymetric??
-- Need the cipher text form BOB from the Encaps to generate it.
 
 HAVE TO IMPLEMENT MESSAGE SIGNATURES IN ORDER TO VERIFY. ML-KEM IS VULNERABLE TO MITM.
 - https://www.reddit.com/r/cryptography/comments/1imyv5r/usage_of_mlkem/
