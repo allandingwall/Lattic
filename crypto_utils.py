@@ -10,8 +10,7 @@ def encapsulate_key(encap_key):
     return key, ciphertext
 
 def decapsulate_key(decap_key, ciphertext):
-    key = ML_KEM_1024.decaps(decap_key, ciphertext)
-    return key
+    return ML_KEM_1024.decaps(decap_key, ciphertext)
 
 def generate_dsa_keys():
     dsa_pub_key, dsa_sec_key = ML_DSA_87.keygen()
