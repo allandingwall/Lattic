@@ -1,17 +1,19 @@
-import crypto_utils
-import quic_handler
+import socket
 
-# ESTABLISH DSA KEY PAIR
-DSA_PUB_KEY, DSA_SEC_KEY = crypto_utils.generate_dsa_keys()
+HOST = "127.0.0.1"
+PORT = 31459
 
-# Await incoming connection
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+s.bind((HOST, PORT))
+print(f"Socket bound to {PORT}.")
+s.listen()
+print("Socket listening...")
+conn, addr = s.accept()
 
-
-# Establish KEM key pair
-encap_key, decap_key = crypto_utils.generate_kem_keys()
-sig = crypto_utils.create_signature(DSA_SEC_KEY, encap_key)
-
-# Send DSA public key and encapsulation key to client
-
-
-# Await client response (containing ciphertext)
+with conn:
+    print(f"Connected by {addr}")
+    while True:
+        data = conn.recv(1024)
+        if not data:
+            break
+        conn.sendall(data)
