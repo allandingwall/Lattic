@@ -54,7 +54,7 @@ if __name__ == "__main__":
     # Generate signing keys at certain time point
     dsa_pub_key, dsa_sec_key = generate_dsa_keys()
     # SEND PUBLIC KEY TO CERTIFICATE AUTHORITY
-    
+
     # When client triggers session:
     encap_key, decap_key = generate_kem_keys()
     sig = create_signature(dsa_sec_key, encap_key)
@@ -62,7 +62,7 @@ if __name__ == "__main__":
 
 
     # CLIENT
-    ## OBTAIN PK FROM CERTIFICATE AUTHORITY
+    ## OBTAIN PUBLIC KEY FROM CERTIFICATE AUTHORITY
     if verify_signature(dsa_pub_key, encap_key, sig):
         client_pq_key, ciphertext = encapsulate_key(encap_key)
     else:
