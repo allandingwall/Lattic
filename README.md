@@ -4,13 +4,13 @@
 
 ## Overview
 
-- Post-quantum key exchange via [ML-KEM (Kyber)](https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.203.pdf)
-- Encrypted data transmission with AES-GCM a key derived from the shared Kyber secret
+- Post-quantum key exchange via [ML-KEM (NIST FIPS 203)](https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.203.pdf), signed with [ML-DSA (NIST FIPS 204)](https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.204.pdf) to prevent Man-In-The-Middle (MITM) attacks.
+- Encrypted data transmission with AES-GCM between client and server using key derived from the shared Kyber secret.
 
 ## Features
 
 - Client/server architecture
-- Kyber key encapsulation
+- Post-quantum key encapsulation mechanism coupled with post-quantum digital signatures.
 - AES-encrypted data exchange
 
 
