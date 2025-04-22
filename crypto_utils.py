@@ -51,10 +51,13 @@ def derive_aes_key(salt, shared_key):
 
 if __name__ == "__main__":
     # SERVER
+    # Generate signing keys
     dsa_pub_key, dsa_sec_key = generate_dsa_keys()
+    # SEND PUBLIC KEY TO CERTIFICATE AUTHORITY
+    # When client triggers session:
     encap_key, decap_key = generate_kem_keys()
     sig = create_signature(dsa_sec_key, encap_key)
-    ## SEND PK, EK TO CLIENT
+    ## SEND SIG, EK TO CLIENT
 
 
     # CLIENT
