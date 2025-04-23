@@ -1,4 +1,5 @@
 import os
+import hashlib
 from kyber_py.ml_kem import ML_KEM_1024
 from dilithium_py.ml_dsa import ML_DSA_87
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
@@ -52,34 +53,44 @@ def derive_aes_key(salt, shared_key):
 if __name__ == "__main__":
     # SERVER
     # Generate signing keys at certain time point
+    print("Server generating signing keys...")
     dsa_pub_key, dsa_sec_key = generate_dsa_keys()
+    print(f"Server Public Signing Key hash: {hashlib.sha256(dsa_pub_key).hexdigest()}")
     # SEND PUBLIC KEY TO CERTIFICATE AUTHORITY
 
     # When client triggers session:
+    print("Server generating encapsulation and decapsulation keys...")
     encap_key, decap_key = generate_kem_keys()
+    print("Server creating digital signature on encapsulation key...")
     sig = create_signature(dsa_sec_key, encap_key)
+    print("Server sending signature and encapsulation key to client... ")
     ## SEND SIG, EK TO CLIENT
+    print()
 
 
     # CLIENT
     ## OBTAIN PUBLIC KEY FROM CERTIFICATE AUTHORITY
+    print("Client verifying signature...")
     if verify_signature(dsa_pub_key, encap_key, sig):
+        print("Client generating shared PQ key...")
         client_pq_key, ciphertext = encapsulate_key(encap_key)
+        print(f"Client PQ Key hash: {hashlib.sha256(client_pq_key).hexdigest()}")
     else:
         raise Exception("Signature verification failed")
     
     salt = os.urandom(16)
+    print("Client deriving AES key...")
     client_aes_key = derive_aes_key(salt, client_pq_key)
-        ## SEND CIPHERTEXT AND SALT BACK TO SERVER
+    print(f"Client AES Key hash: {hashlib.sha256(client_aes_key).hexdigest()}")
+    ## SEND CIPHERTEXT AND SALT BACK TO SERVER
+    print()
     
 
     # SERVER
+    print("Server generating shared PQ key...")
     server_pq_key = decapsulate_key(decap_key, ciphertext)
-    server_aes_key = derive_aes_key(salt, server_pq_key)
+    print(f"Server PQ Key hash: {hashlib.sha256(server_pq_key).hexdigest()}")
 
-
-
-    print(f"Client PQ Key: {client_pq_key.hex()}")
-    print(f"Server PQ Key: {server_pq_key.hex()}")
-    print(f"Client AES Key: {client_aes_key.hex()}")
-    print(f"Server AES Key: {server_aes_key.hex()}")
+    print("Server deriving AES key...")
+    server_aes_key = derive_aes_key(salt, server_pq_key)   
+    print(f"Server AES Key hash: {hashlib.sha256(server_aes_key).hexdigest()}")
