@@ -14,7 +14,7 @@
 - AES-encrypted data exchange
 
 ## Usage
-**WIP**
+*WIP*
 
 
 ## To Do
