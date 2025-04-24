@@ -1,6 +1,12 @@
-import socket
+import asyncio
+import struct
 
-s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+async def send_message(writer, data: bytes):
+    writer.write(struct.pack('!I', len(data)))
+    writer.write(data)
+    await writer.drain()
 
-if __name__ == "__main__":
-    print("Test")
+async def receive_message(reader) -> bytes:
+    raw_len = await reader.readexactly(4)
+    (length,) = struct.unpack('!I', raw_len)
+    return await reader.readexactly(length)
