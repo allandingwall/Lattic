@@ -31,7 +31,7 @@ def decapsulate_key(decap_key, ciphertext):
 def derive_aes_key(salt, shared_key):
     kdf = PBKDF2HMAC(
         algorithm=hashes.SHA256(),
-        length=256,
+        length=32,
         salt=salt,
         iterations=100000,
     )
@@ -39,7 +39,7 @@ def derive_aes_key(salt, shared_key):
 
     kdf = PBKDF2HMAC(
         algorithm=hashes.SHA256(),
-        length=256,
+        length=32,
         salt=salt,
         iterations=100000,
     )
@@ -50,6 +50,19 @@ def derive_aes_key(salt, shared_key):
     
     except:
         raise Exception("Key derivation failed")
+    
+def encrypt_message(msg, aes_key):
+    msg = msg.encode()
+    aesgcm = AESGCM(aes_key)
+    nonce = os.urandom(12)
+    ciphertext = aesgcm.encrypt(nonce, msg, None)
+    payload = nonce + ciphertext
+    return payload
+
+def decrypt_message(payload, aes_key):
+    nonce, ciphertext = payload[:12], payload[12:]
+    aesgcm = AESGCM(aes_key)
+    return (aesgcm.decrypt(nonce, ciphertext, None)).decode()
 
 if __name__ == "__main__":
     # SERVER
@@ -94,3 +107,15 @@ if __name__ == "__main__":
     print("Server deriving AES key...")
     server_aes_key = derive_aes_key(salt, server_pq_key)   
     print(f"Server AES Key hash: {hashlib.sha256(server_aes_key).hexdigest()}")
+
+    print()
+    print(server_aes_key)
+    server_message = "Hello mate!"
+    print(f"Server message: {server_message}")
+    payload = encrypt_message(server_message, server_aes_key)
+    print(f"Client encrypted payload: {payload}")
+
+    # SENC ENC TO CLIENT
+    print(f"Server encrypted payload: {payload}")
+    client_message = decrypt_message(payload, client_aes_key)
+    print(f"Client message: {client_message}")
