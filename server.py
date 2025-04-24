@@ -1,49 +1,53 @@
 import asyncio
 import base64
-import crypto_utils
 import hashlib
+import struct
+import crypto_utils
 
-print("Generating signing keys...")
-dsa_pub_key, dsa_sec_key =crypto_utils.generate_dsa_keys()
-print(f"Server Public Signing Key hash: {hashlib.sha256(dsa_pub_key).hexdigest()}\n")
+async def send_message(writer, data: bytes):
+    writer.write(struct.pack('!I', len(data)))
+    writer.write(data)
+    await writer.drain()
 
+async def receive_message(reader) -> bytes:
+    raw_len = await reader.readexactly(4)
+    (length,) = struct.unpack('!I', raw_len)
+    return await reader.readexactly(length)
+
+async def establish_shared_key_server(reader, writer):
+    dsa_pub_key, dsa_sec_key = crypto_utils.generate_dsa_keys()
+    encap_key, decap_key = crypto_utils.generate_kem_keys()
+    sig = crypto_utils.create_signature(dsa_sec_key, encap_key)
+
+    await send_message(writer, base64.b64encode(encap_key))
+    await send_message(writer, base64.b64encode(sig))
+
+    ciphertext = base64.b64decode(await receive_message(reader))
+    salt = base64.b64decode(await receive_message(reader))
+
+    pq_key = crypto_utils.decapsulate_key(decap_key, ciphertext)
+    aes_key = crypto_utils.derive_aes_key(salt, pq_key)
+
+    print(f"Server AES Key hash: {hashlib.sha256(aes_key).hexdigest()}")
+    return aes_key
 
 async def handle_client(reader, writer):
     addr = writer.get_extra_info('peername')
-    print(f"Connected to client on {addr}")
-    encap_key, decap_key = crypto_utils.generate_kem_keys()
-    sig = crypto_utils.create_signature(dsa_sec_key, encap_key)
-    print("Sending signature and encapsulation key to client...\n")
+    print(f"Connected to client at {addr}")
 
-    message = f"{encap_key.hex()};{sig.hex()}"
-    writer.write(message.encode())
-    await writer.drain()
+    try:
+        await establish_shared_key_server(reader, writer)
+    except Exception as e:
+        print(f"Error during key exchange: {e}")
 
-
-
-    while True:
-        data = await reader.read(2048)
-        if not data:
-            break
-        message = data.decode()
-        print(f"Received {message!r} from {addr}")
-
-        response = f"Echo: {message}"
-        writer.write(response.encode())
-        await writer.drain()
-
-    print(f"Closing connection with {addr}")
     writer.close()
     await writer.wait_closed()
 
 async def run_server():
     server = await asyncio.start_server(handle_client, "127.0.0.1", 8888)
-    addrs = ', '.join(str(sock.getsockname()) for sock in server.sockets)
-    print(f"Serving on {addrs}")
-
+    print("Server running on 127.0.0.1:8888")
     async with server:
         await server.serve_forever()
 
-# Run the server
 if __name__ == "__main__":
     asyncio.run(run_server())
