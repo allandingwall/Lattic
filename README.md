@@ -24,3 +24,4 @@
 - Implement command-line arguments to choose whether to act as a client or server, then consolidate client and server code into one file.
 - Implement QUIC protocol for key exchange. The lower overhead of QUIC compared to TLS will enable a more efficient key exhange.
 - Write Usage section on README.
+- Add hash visualisation function for verification of shared AES key.
