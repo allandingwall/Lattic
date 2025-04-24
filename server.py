@@ -1,18 +1,23 @@
 import asyncio
+import base64
 import crypto_utils
 import hashlib
 
-print("Server generating signing keys...")
+print("Generating signing keys...")
 dsa_pub_key, dsa_sec_key =crypto_utils.generate_dsa_keys()
-print(f"Server Public Signing Key hash: {hashlib.sha256(dsa_pub_key).hexdigest()}")
+print(f"Server Public Signing Key hash: {hashlib.sha256(dsa_pub_key).hexdigest()}\n")
 
 
 async def handle_client(reader, writer):
     addr = writer.get_extra_info('peername')
-    print(f"Connected to {addr}")
+    print(f"Connected to client on {addr}")
+    encap_key, decap_key = crypto_utils.generate_kem_keys()
+    sig = crypto_utils.create_signature(dsa_sec_key, encap_key)
+    print("Sending signature and encapsulation key to client...\n")
 
-
-
+    message = f"{encap_key.hex()};{sig.hex()}"
+    writer.write(message.encode())
+    await writer.drain()
 
 
 
@@ -20,7 +25,6 @@ async def handle_client(reader, writer):
         data = await reader.read(2048)
         if not data:
             break
-        print("Client connected")
         message = data.decode()
         print(f"Received {message!r} from {addr}")
 

@@ -17,7 +17,7 @@ def verify_signature(pk, msg, sig):
     return ML_DSA_87.verify(pk, msg, sig)
 
 def generate_kem_keys():
-    print("Server generating encapsulation and decapsulation keys...")
+    print("Generating encapsulation and decapsulation keys...")
     encap_key, decap_key = ML_KEM_1024.keygen()
     return encap_key, decap_key
 
