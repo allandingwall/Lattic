@@ -7,6 +7,7 @@ from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 
 def generate_dsa_keys():
+    print("Generating signing keys...")
     dsa_pub_key, dsa_sec_key = ML_DSA_87.keygen()
     # ADD IN LOGIC TO SEND PUBLIC KEY TO THE DATABASE (CERTIFICATE AUTHORITY)
     return dsa_pub_key, dsa_sec_key
