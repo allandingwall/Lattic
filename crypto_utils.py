@@ -17,6 +17,7 @@ def verify_signature(pk, msg, sig):
     return ML_DSA_87.verify(pk, msg, sig)
 
 def generate_kem_keys():
+    print("Server generating encapsulation and decapsulation keys...")
     encap_key, decap_key = ML_KEM_1024.keygen()
     return encap_key, decap_key
 
@@ -56,10 +57,9 @@ if __name__ == "__main__":
     print("Server generating signing keys...")
     dsa_pub_key, dsa_sec_key = generate_dsa_keys()
     print(f"Server Public Signing Key hash: {hashlib.sha256(dsa_pub_key).hexdigest()}")
-    # SEND PUBLIC KEY TO CERTIFICATE AUTHORITY
+    # SEND PUBLIC KEY TO CERTIFICATE AUTHORITY (DATABASE)
 
     # When client triggers session:
-    print("Server generating encapsulation and decapsulation keys...")
     encap_key, decap_key = generate_kem_keys()
     print("Server creating digital signature on encapsulation key...")
     sig = create_signature(dsa_sec_key, encap_key)

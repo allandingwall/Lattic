@@ -1,11 +1,27 @@
-import socket
+import asyncio
+import crypto_utils
 
-HOST = "127.0.0.1"  # The server's hostname or IP address
-PORT = 31459  # The port used by the server
+print("Server generating signing keys...")
+dsa_pub_key, dsa_sec_key =crypto_utils.generate_dsa_keys()
 
-with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-    s.connect((HOST, PORT))
-    s.sendall(b"Hello, world")
-    data = s.recv(1024)
+async def run_client():
+    reader, writer = await asyncio.open_connection("127.0.0.1", 8888)
+    data = await reader.read(1024)
 
-print(f"Received {data!r}")
+
+
+    message = "NEW SESSION"
+    print(f"Sending: {message}")
+    writer.write(message.encode())
+    await writer.drain()
+
+    
+    print(f"Received: {data.decode()}")
+
+    print("Closing the connection")
+    writer.close()
+    await writer.wait_closed()
+
+# Run the client
+if __name__ == "__main__":
+    asyncio.run(run_client())

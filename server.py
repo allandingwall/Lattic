@@ -1,19 +1,45 @@
-import socket
+import asyncio
+import crypto_utils
+import hashlib
 
-HOST = "127.0.0.1"
-PORT = 31459
+print("Server generating signing keys...")
+dsa_pub_key, dsa_sec_key =crypto_utils.generate_dsa_keys()
+print(f"Server Public Signing Key hash: {hashlib.sha256(dsa_pub_key).hexdigest()}")
 
-s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-s.bind((HOST, PORT))
-print(f"Socket bound to {PORT}.")
-s.listen()
-print("Socket listening...")
-conn, addr = s.accept()
 
-with conn:
-    print(f"Connected by {addr}")
+async def handle_client(reader, writer):
+    addr = writer.get_extra_info('peername')
+    print(f"Connected to {addr}")
+
+
+
+
+
+
     while True:
-        data = conn.recv(1024)
+        data = await reader.read(2048)
         if not data:
             break
-        conn.sendall(data)
+        print("Client connected")
+        message = data.decode()
+        print(f"Received {message!r} from {addr}")
+
+        response = f"Echo: {message}"
+        writer.write(response.encode())
+        await writer.drain()
+
+    print(f"Closing connection with {addr}")
+    writer.close()
+    await writer.wait_closed()
+
+async def run_server():
+    server = await asyncio.start_server(handle_client, "127.0.0.1", 8888)
+    addrs = ', '.join(str(sock.getsockname()) for sock in server.sockets)
+    print(f"Serving on {addrs}")
+
+    async with server:
+        await server.serve_forever()
+
+# Run the server
+if __name__ == "__main__":
+    asyncio.run(run_server())
